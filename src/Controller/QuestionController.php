@@ -61,17 +61,10 @@ EOF
     /**
      * @Route("/questions/{slug}", name="app_question_show")
      */
-    public function show($slug, MarkdownHelper $markdownHelper, EntityManagerInterface $entityManager)
+    public function show(Question $question)
     {
         if ($this->isDebug) {
             $this->logger->info('We are in debug mode!');
-        }
-
-        $repository = $entityManager->getRepository(Question::class);
-        /** @var Question|null $question */
-        $question = $repository->findOneBy(['slug' => $slug]);
-        if (!$question) {
-            throw $this->createNotFoundException(sprintf('No question found for %s', $slug));
         }
 
         $answers = [
