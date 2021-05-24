@@ -48,6 +48,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et orci eu ligula
 EOF
 );
 
+        $question->setVotes(rand(-20, 50));
+
         if (rand(0,1)) {
             $question->setAskedAt(new \DateTime(sprintf("-%d days", rand(1, 100))));
         }
