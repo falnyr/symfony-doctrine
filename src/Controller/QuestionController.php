@@ -56,10 +56,17 @@ EOF
     /**
      * @Route("/questions/{slug}", name="app_question_show")
      */
-    public function show($slug, MarkdownHelper $markdownHelper)
+    public function show($slug, MarkdownHelper $markdownHelper, EntityManagerInterface $entityManager)
     {
         if ($this->isDebug) {
             $this->logger->info('We are in debug mode!');
+        }
+
+        $repository = $entityManager->getRepository(Question::class);
+        /** @var Question|null $question */
+        $question = $repository->findOneBy(['slug' => $slug]);
+        if (!$question) {
+            throw $this->createNotFoundException(sprintf('No question found for %s', $slug));
         }
 
         $answers = [
@@ -67,13 +74,9 @@ EOF
             'Honestly, I like furry shoes better than MY cat',
             'Maybe... try saying the spell backwards?',
         ];
-        $questionText = 'I\'ve been turned into a cat, any *thoughts* on how to turn back? While I\'m **adorable**, I don\'t really care for cat food.';
-
-        $parsedQuestionText = $markdownHelper->parse($questionText);
 
         return $this->render('question/show.html.twig', [
-            'question' => ucwords(str_replace('-', ' ', $slug)),
-            'questionText' => $parsedQuestionText,
+            'question' => $question,
             'answers' => $answers,
         ]);
     }
