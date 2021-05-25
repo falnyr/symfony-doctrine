@@ -41,24 +41,7 @@ class QuestionController extends AbstractController
      */
     public function new(EntityManagerInterface $entityManager)
     {
-        $question = new Question();
-        $question->setName('Foobar');
-        $question->setSlug('foobar-'.rand(1,1000));
-        $question->setQuestion(<<<EOF
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et orci eu ligula posuere sodales ut vel odio. Quisque viverra, eros et elementum lobortis, dolor nisi varius nisi, id blandit ipsum felis at metus. Quisque nec est vel lacus elementum ornare et quis tortor. Morbi sollicitudin turpis at dictum luctus. In magna erat, tempus vitae porttitor eget, porta id tellus. Nulla facilisi. Maecenas porttitor iaculis felis nec rutrum. Proin gravida lacus non vulputate euismod. Phasellus sit amet ultrices nunc. Duis sollicitudin auctor maximus. Cras nec dapibus nisi. Proin tortor turpis, aliquet ac arcu posuere, pellentesque fermentum nisi.
-EOF
-);
-
-        $question->setVotes(rand(-20, 50));
-
-        if (rand(0,1)) {
-            $question->setAskedAt(new \DateTime(sprintf("-%d days", rand(1, 100))));
-        }
-
-        $entityManager->persist($question);
-        $entityManager->flush();
-
-        return new Response($question->getId());
+        return new Response('TODO');
     }
 
     /**
@@ -85,15 +68,19 @@ EOF
     /**
      * @Route("/question/{slug}/vote", name="app_question_vote", methods={"POST"})
      */
-    public function questionVote(Question $question, Request $request)
+    public function questionVote(Question $question, Request $request, EntityManagerInterface $entityManager)
     {
         $direction = $request->request->get('direction');
         if ($direction === 'up') {
-            $question->setVotes($question->getVotes() + 1);
+            $question->upVote();
         } elseif ($direction === 'down') {
-            $question->setVotes($question->getVotes() - 1);
+            $question->downVote();
         }
 
-        dd($question);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_question_show', [
+            'slug' => $question->getSlug()
+        ]);
     }
 }
